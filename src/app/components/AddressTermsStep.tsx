@@ -69,7 +69,7 @@ export default function AddressTermsStep({
     formData.agreedToTerms;
 
   return (
-    <div className="w-full mx-auto max-w-5xl my-auto flex flex-col h-full">
+    <div className="w-full mx-auto max-w-4xl my-auto">
       <div className="mb-6">
         <p className="text-sm text-gray-500">Step 4 of 5</p>
         <h1 className="mt-2 text-3xl font-bold text-gray-900">
@@ -226,7 +226,7 @@ export default function AddressTermsStep({
       </form>
 
       {/* Navigation Buttons */}
-      <div className="mt-auto flex justify-between items-center max-w-4xl w-full pt-6">
+      <div className="flex justify-between items-center max-w-2xl w-full pt-6 mt-4">
         <button
           onClick={onBack}
           className="flex items-center gap-2 font-semibold text-gray-900 hover:text-[#0F62FE] transition-colors"

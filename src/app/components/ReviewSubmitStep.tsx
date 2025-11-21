@@ -110,7 +110,7 @@ export default function ReviewSubmitStep({
   };
 
   return (
-    <div className="w-full mx-auto max-w-5xl max-h-[80vh] my-auto  flex flex-col h-full  overflow-y-auto">
+    <div className="w-full mx-auto max-w-5xl max-h-[80vh] my-auto  flex flex-col h-full ">
       <div className="mb-6">
         <p className="text-sm text-gray-500">Step 5 of 5</p>
         <h1 className="mt-2 text-3xl font-bold text-gray-900">

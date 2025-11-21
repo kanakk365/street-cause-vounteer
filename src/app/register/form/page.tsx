@@ -1,7 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
+import { useRouter } from "next/navigation";
 import PersonalInfoStep, {
   PersonalInfoData,
 } from "../../components/PersonalInfoStep";
@@ -9,6 +11,7 @@ import GovtIdStep from "../../components/GovtIdStep";
 import LiveSelfieStep from "../../components/LiveSelfieStep";
 import AddressTermsStep from "../../components/AddressTermsStep";
 import ReviewSubmitStep from "../../components/ReviewSubmitStep";
+import SuccessStep from "../../components/SuccessStep";
 import { useOnboardingStore } from "../../../store/onboardingStore";
 
 const steps = [
@@ -20,6 +23,8 @@ const steps = [
 ];
 
 export default function RegistrationForm() {
+  const router = useRouter();
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const {
     currentStep,
     setCurrentStep,
@@ -83,9 +88,19 @@ export default function RegistrationForm() {
       });
       
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error("API Error:", errorText);
-        throw new Error(`Submission failed: ${response.status} ${response.statusText}`);
+        const errorData = await response.json().catch(() => null);
+        console.error("API Error:", errorData);
+        
+        let errorMessage = `Submission failed: ${response.status} ${response.statusText}`;
+        
+        if (errorData) {
+            if (Array.isArray(errorData.message)) {
+                errorMessage = errorData.message.join("\n");
+            } else if (typeof errorData.message === 'string') {
+                errorMessage = errorData.message;
+            }
+        }
+        throw new Error(errorMessage);
       }
       
       const result = await response.json();
@@ -94,10 +109,11 @@ export default function RegistrationForm() {
       // Reset store after successful submission
       reset();
       
-      alert("Application Submitted Successfully! You will receive your SC Volunteer ID soon.");
+      setIsSubmitted(true);
+      toast.success("Application Submitted Successfully! You will receive your SC Volunteer ID soon.");
     } catch (error) {
       console.error("Error submitting application:", error);
-      alert(`Failed to submit application: ${error instanceof Error ? error.message : "Unknown error"}. Please try again.`);
+      toast.error(error instanceof Error ? error.message : "Failed to submit application. Please try again.");
     }
   };
 
@@ -150,8 +166,8 @@ export default function RegistrationForm() {
                 </div>
 
                 {/* Line */}
-                {index !== steps.length - 1 && (
-                  <div className="h-12 w-[1px] bg-white/30"></div>
+                {step.id !== steps.length && (
+                  <div className="h-12 w-px bg-white/30"></div>
                 )}
               </div>
             ))}
@@ -159,7 +175,7 @@ export default function RegistrationForm() {
 
           {/* Right Column: Labels */}
           <div className="ml-6 flex flex-col">
-            {steps.map((step, index) => (
+            {steps.map((step) => (
               <div
                 key={`label-${step.id}`}
                 className="flex h-10 items-center mb-12 last:mb-0"
@@ -178,10 +194,11 @@ export default function RegistrationForm() {
       </div>
 
       {/* Right Content - 65% width */}
-      <div className="flex w-full flex-col bg-white px-16 py-8 lg:w-[65%] justify-center">
-        {currentStep === 1 && (
-          <PersonalInfoStep onNext={handlePersonalInfoNext} />
-        )}
+      <div className="flex w-full flex-col bg-white px-4 sm:px-8 lg:px-16 py-8 lg:w-[65%] overflow-y-auto">
+        <div className="flex flex-col justify-center min-h-full">
+          {currentStep === 1 && (
+            <PersonalInfoStep onNext={handlePersonalInfoNext} />
+          )}
         {currentStep === 2 && (
           <GovtIdStep onNext={handleGovtIdNext} onBack={handleGovtIdBack} />
         )}
@@ -197,13 +214,17 @@ export default function RegistrationForm() {
             onBack={handleAddressTermsBack}
           />
         )}
-        {currentStep === 5 && (
+        {currentStep === 5 && !isSubmitted && (
           <ReviewSubmitStep
             onBack={handleReviewBack}
             onSubmit={handleSubmitApplication}
             personalData={personalInfo}
           />
         )}
+        {isSubmitted && (
+          <SuccessStep onGoToDashboard={() => router.push("/")} />
+        )}
+        </div>
       </div>
     </div>
   );

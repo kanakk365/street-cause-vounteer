@@ -3,13 +3,14 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
-  const [showPassword, setShowPassword] = useState(false);
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
-    volunteerIdOrEmail: "",
-    password: "",
+    registrationCode: "",
     agreedToTerms: false,
   });
 
@@ -17,10 +18,58 @@ export default function LoginPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log("Login attempt:", formData);
+    
+    if (!formData.agreedToTerms) {
+      toast.error("Please agree to the Terms & Conditions");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      const response = await fetch("https://scapi.elitceler.com/api/v1/volunteers/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          registrationCode: formData.registrationCode,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        let errorMessage = "Login failed. Please check your registration code.";
+        
+        if (errorData) {
+          if (Array.isArray(errorData.message)) {
+            errorMessage = errorData.message.join("\n");
+          } else if (typeof errorData.message === "string") {
+            errorMessage = errorData.message;
+          }
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      const result = await response.json();
+      
+      // Store access token in localStorage
+      if (result.accessToken) {
+        localStorage.setItem("accessToken", result.accessToken);
+        localStorage.setItem("registrationCode", result.registrationCode || formData.registrationCode);
+      }
+
+      toast.success("Login successful!");
+      router.push("/");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast.error(error instanceof Error ? error.message : "Login failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -62,64 +111,30 @@ export default function LoginPage() {
 
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
-            {/* Volunteer ID / Email Input */}
+            {/* Registration Code Input */}
             <div>
               <label
-                htmlFor="volunteerIdOrEmail"
+                htmlFor="registrationCode"
                 className="mb-2 block text-sm font-medium text-gray-700"
               >
-                Volunteer ID / Email
+                Registration Code
               </label>
               <input
                 type="text"
-                id="volunteerIdOrEmail"
-                value={formData.volunteerIdOrEmail}
+                id="registrationCode"
+                value={formData.registrationCode}
                 onChange={(e) =>
-                  handleInputChange("volunteerIdOrEmail", e.target.value)
+                  handleInputChange("registrationCode", e.target.value.toUpperCase())
                 }
                 className="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:border-[#0F62FE] focus:outline-none focus:ring-2 focus:ring-[#0F62FE]/20"
-                placeholder="Enter your Volunteer ID or Email"
+                placeholder="Enter your Registration Code (e.g., SCMUB7)"
                 required
+                disabled={isLoading}
               />
             </div>
 
-            {/* Password Input */}
+            {/* Terms & Conditions */}
             <div>
-              <label
-                htmlFor="password"
-                className="mb-2 block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  id="password"
-                  value={formData.password}
-                  onChange={(e) =>
-                    handleInputChange("password", e.target.value)
-                  }
-                  className="w-full rounded-lg border border-gray-300 px-4 py-3 pr-12 text-gray-900 placeholder-gray-400 focus:border-[#0F62FE] focus:outline-none focus:ring-2 focus:ring-[#0F62FE]/20"
-                  placeholder="Enter your password"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  aria-label="Toggle password visibility"
-                >
-                  {showPassword ? (
-                    <EyeOff size={20} />
-                  ) : (
-                    <Eye size={20} />
-                  )}
-                </button>
-              </div>
-            </div>
-
-            {/* Terms & Conditions and Forgot Password */}
-            <div className="flex items-center justify-between">
               <label className="flex items-center">
                 <input
                   type="checkbox"
@@ -128,6 +143,7 @@ export default function LoginPage() {
                     handleInputChange("agreedToTerms", e.target.checked)
                   }
                   className="h-4 w-4 rounded border-gray-300 text-[#0F62FE] focus:ring-[#0F62FE]"
+                  disabled={isLoading}
                 />
                 <span className="ml-2 text-sm text-gray-600">
                   I have read and agree to the{" "}
@@ -142,24 +158,16 @@ export default function LoginPage() {
               </label>
             </div>
 
-            <div className="flex justify-end">
-              <Link
-                href="#"
-                className="text-sm text-[#0F62FE] hover:underline"
-              >
-                Forgot password
-              </Link>
-            </div>
-
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full rounded-lg py-3 px-4 font-semibold text-white transition-opacity hover:opacity-90"
+              disabled={isLoading}
+              className="w-full rounded-lg py-3 px-4 font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 background: "linear-gradient(180deg, #297AE0 0%, #0054BE 100%)",
               }}
             >
-              Login
+              {isLoading ? "Logging in..." : "Login"}
             </button>
           </form>
 

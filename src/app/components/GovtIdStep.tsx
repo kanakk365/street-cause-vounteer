@@ -78,7 +78,7 @@ export default function GovtIdStep({ onNext, onBack }: GovtIdStepProps) {
   };
 
   return (
-    <div className="w-full mx-auto max-w-4xl max-h-[70vh] my-auto flex flex-col h-full">
+    <div className="w-full mx-auto max-w-4xl my-auto flex flex-col">
       <div className="mb-6">
         <p className="text-sm text-gray-500">Step 2 of 5</p>
         <h1 className="mt-2 text-3xl font-bold text-gray-900">
@@ -129,7 +129,7 @@ export default function GovtIdStep({ onNext, onBack }: GovtIdStepProps) {
       <div
         onDragOver={(e) => e.preventDefault()}
         onDrop={handleDrop}
-        className="border-2 border-dashed border-[#0F62FE]/30 rounded-lg p-12 text-center hover:bg-blue-50/50 transition-colors mb-6 w-full"
+        className="border-2 border-dashed border-[#0F62FE]/30 rounded-lg p-6 sm:p-12 text-center hover:bg-blue-50/50 transition-colors mb-6 w-full"
       >
         <input
           type="file"
@@ -154,31 +154,31 @@ export default function GovtIdStep({ onNext, onBack }: GovtIdStepProps) {
 
       {/* Uploaded Files List */}
       {uploadedIds.length > 0 && (
-        <div className="mb-6 w-full space-y-3 max-h-[30vh] overflow-y-auto">
+        <div className="mb-6 w-full space-y-3">
           {uploadedIds.map((uploadedId) => (
             <div
               key={uploadedId.id}
               className="bg-blue-100/50 rounded-lg p-4 border border-blue-100"
             >
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center gap-3 flex-1">
+              <div className="flex items-center justify-between mb-2 gap-2">
+                <div className="flex items-center gap-3 flex-1 min-w-0">
                   <div className="bg-red-500 p-2 rounded text-white flex-shrink-0">
                     <FileText size={20} />
                   </div>
-                  <span className="text-[#0F62FE] font-medium truncate">
+                  <span className="text-[#0F62FE] font-medium truncate text-sm sm:text-base">
                     {uploadedId.file.name}
                   </span>
                 </div>
                 <button
                   onClick={() => removeFile(uploadedId.id)}
-                  className="bg-[#0F62FE] p-2 rounded-full text-white hover:bg-blue-700 transition-colors flex-shrink-0 ml-2"
+                  className="bg-[#0F62FE] p-2 rounded-full text-white hover:bg-blue-700 transition-colors flex-shrink-0"
                 >
                   <Trash2 size={16} />
                 </button>
               </div>
 
               {/* ID Type Dropdown for each uploaded file */}
-              <div className="relative ml-11">
+              <div className="relative ml-11 sm:ml-11">
                 <button
                   type="button"
                   onClick={() =>
@@ -188,10 +188,10 @@ export default function GovtIdStep({ onNext, onBack }: GovtIdStepProps) {
                   }
                   className="flex w-full items-center justify-between border-b border-gray-300 py-1 text-left text-sm outline-none focus:border-[#0F62FE]"
                 >
-                  <span className="text-gray-700">{uploadedId.idType}</span>
+                  <span className="text-gray-700 truncate">{uploadedId.idType}</span>
                   <ChevronDown
                     size={16}
-                    className={`text-gray-400 transition-transform ${
+                    className={`text-gray-400 transition-transform flex-shrink-0 ml-2 ${
                       editingDropdown === uploadedId.id ? "rotate-180" : ""
                     }`}
                   />
