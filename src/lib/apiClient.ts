@@ -1,6 +1,5 @@
 import { useAuthStore } from "@/store/authStore";
-
-// Get the store instance outside of React component
+    
 const getAuthStore = () => {
   return useAuthStore.getState();
 };
@@ -11,12 +10,24 @@ export async function apiRequest(
 ): Promise<Response> {
   const { accessToken, clearAuth } = getAuthStore();
 
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     "Content-Type": "application/json",
-    ...options.headers,
   };
 
-  // Add authorization header if token exists
+  if (options.headers) {
+    if (options.headers instanceof Headers) {
+      options.headers.forEach((value, key) => {
+        headers[key] = value;
+      });
+    } else if (Array.isArray(options.headers)) {
+      options.headers.forEach(([key, value]) => {
+        headers[key] = value;
+      });
+    } else {
+      Object.assign(headers, options.headers);
+    }
+  }
+
   if (accessToken) {
     headers["Authorization"] = `Bearer ${accessToken}`;
   }
@@ -27,41 +38,33 @@ export async function apiRequest(
       headers,
     });
 
-    // Handle 401 Unauthorized globally
     if (response.status === 401) {
-      // Try to parse error response for logging
       try {
         const errorData = await response.clone().json();
         console.error("401 Unauthorized:", errorData);
-      } catch {
-        // Ignore JSON parse errors
+      } catch { 
       }
 
-      // Clear auth store
       clearAuth();
       
-      // Redirect to login page
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }
       
-      // Throw error to prevent further processing
       throw new Error("Unauthorized");
     }
 
     return response;
   } catch (error) {
-    // Re-throw the error so calling code can handle it
     throw error;
   }
 }
 
-// Convenience methods
 export const apiGet = (url: string, options?: RequestInit) => {
   return apiRequest(url, { ...options, method: "GET" });
 };
 
-export const apiPost = (url: string, data?: any, options?: RequestInit) => {
+export const apiPost = (url: string, data?: unknown, options?: RequestInit) => {
   return apiRequest(url, {
     ...options,
     method: "POST",
@@ -69,7 +72,7 @@ export const apiPost = (url: string, data?: any, options?: RequestInit) => {
   });
 };
 
-export const apiPut = (url: string, data?: any, options?: RequestInit) => {
+export const apiPut = (url: string, data?: unknown, options?: RequestInit) => {
   return apiRequest(url, {
     ...options,
     method: "PUT",
