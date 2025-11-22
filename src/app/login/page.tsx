@@ -1,18 +1,28 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { useAuthStore } from "@/store/authStore";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { accessToken, setAuth } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     registrationCode: "",
     agreedToTerms: false,
   });
+
+  useEffect(() => {
+    // Check if user is already logged in
+    if (accessToken) {
+      // User is already logged in, redirect to dashboard
+      router.push("/dashboard");
+    }
+  }, [accessToken, router]);
 
   const handleInputChange = (field: string, value: string | boolean) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -56,14 +66,13 @@ export default function LoginPage() {
 
       const result = await response.json();
       
-      // Store access token in localStorage
+      // Store access token using zustand store
       if (result.accessToken) {
-        localStorage.setItem("accessToken", result.accessToken);
-        localStorage.setItem("registrationCode", result.registrationCode || formData.registrationCode);
+        setAuth(result.accessToken, result.registrationCode || formData.registrationCode);
       }
 
       toast.success("Login successful!");
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       console.error("Login error:", error);
       toast.error(error instanceof Error ? error.message : "Login failed. Please try again.");
