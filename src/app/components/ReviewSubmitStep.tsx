@@ -60,7 +60,7 @@ const SectionHeader = ({
 }) => (
   <button
     onClick={() => onToggle(sectionKey)}
-    className="flex w-full items-center justify-between p-4 text-left focus:outline-none"
+    className="flex w-full items-center justify-between p-4 text-left focus:outline-none cursor-pointer"
   >
     <span className="text-lg font-medium text-gray-900">{title}</span>
     {isExpanded ? (
@@ -202,7 +202,7 @@ export default function ReviewSubmitStep({
                 {/* Edit Icon */}
                 <button 
                   onClick={() => handleEdit(1)}
-                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors"
+                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors cursor-pointer"
                   title="Edit Personal Information"
                 >
                   <Pencil size={18} />
@@ -247,7 +247,7 @@ export default function ReviewSubmitStep({
               {/* Edit Icon - Outside the blue box */}
               <button 
                 onClick={() => handleEdit(2)}
-                className="absolute top-4 right-6 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors"
+                className="absolute top-4 right-6 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors cursor-pointer"
                 title="Edit Government ID"
               >
                 <Pencil size={18} />
@@ -291,7 +291,7 @@ export default function ReviewSubmitStep({
                 {/* Edit Icon */}
                 <button 
                   onClick={() => handleEdit(3)}
-                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors"
+                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors cursor-pointer"
                   title="Edit Selfie"
                 >
                   <Pencil size={18} />
@@ -358,7 +358,7 @@ export default function ReviewSubmitStep({
                 {/* Edit Icon */}
                 <button 
                   onClick={() => handleEdit(4)}
-                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors"
+                  className="absolute top-0 right-0 p-2 text-gray-500 hover:text-[#0F62FE] transition-colors cursor-pointer"
                   title="Edit Address"
                 >
                   <Pencil size={18} />
@@ -370,17 +370,17 @@ export default function ReviewSubmitStep({
       </div>
 
       {/* Navigation Buttons */}
-      <div className="mt-auto flex justify-between items-center w-full pt-6">
+      <div className="mt-auto flex justify-between items-center w-full pt-6 pb-8">
         <button
           onClick={onBack}
-          className="flex items-center gap-2 font-semibold text-gray-900 hover:text-[#0F62FE] transition-colors"
+          className="flex items-center gap-2 font-semibold text-gray-900 hover:text-[#0F62FE] transition-colors cursor-pointer"
         >
           <ArrowLeft size={20} /> Back
         </button>
 
         <button
           onClick={onSubmit}
-          className="flex items-center gap-2 font-semibold text-[#0F62FE] hover:underline transition-colors"
+          className="flex items-center gap-2 font-semibold text-[#0F62FE] hover:underline transition-colors cursor-pointer"
         >
           Submit Application <ArrowRight size={20} />
         </button>

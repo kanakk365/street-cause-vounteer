@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -11,7 +11,6 @@ import GovtIdStep from "../../components/GovtIdStep";
 import LiveSelfieStep from "../../components/LiveSelfieStep";
 import AddressTermsStep from "../../components/AddressTermsStep";
 import ReviewSubmitStep from "../../components/ReviewSubmitStep";
-import SuccessStep from "../../components/SuccessStep";
 import { useOnboardingStore } from "../../../store/onboardingStore";
 
 const steps = [
@@ -24,7 +23,6 @@ const steps = [
 
 export default function RegistrationForm() {
   const router = useRouter();
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const {
     currentStep,
     setCurrentStep,
@@ -106,11 +104,11 @@ export default function RegistrationForm() {
       const result = await response.json();
       console.log("Submission successful:", result);
       
-      // Reset store after successful submission
-      reset();
-      
-      setIsSubmitted(true);
       toast.success("Application Submitted Successfully! You will receive your SC Volunteer ID soon.");
+      
+      router.push("/login");
+      
+      reset();
     } catch (error) {
       console.error("Error submitting application:", error);
       toast.error(error instanceof Error ? error.message : "Failed to submit application. Please try again.");
@@ -214,15 +212,12 @@ export default function RegistrationForm() {
             onBack={handleAddressTermsBack}
           />
         )}
-        {currentStep === 5 && !isSubmitted && (
+        {currentStep === 5 && (
           <ReviewSubmitStep
             onBack={handleReviewBack}
             onSubmit={handleSubmitApplication}
             personalData={personalInfo}
           />
-        )}
-        {isSubmitted && (
-          <SuccessStep onGoToDashboard={() => router.push("/")} />
         )}
         </div>
       </div>

@@ -1,7 +1,10 @@
-import Image from "next/image";
-import { Edit, Wallet, Sprout, Users, Calendar } from "lucide-react";
+// Dashboard content commented out for now - showing "Coming Soon" instead
+// import Image from "next/image";
+// import { Edit, Wallet, Sprout, Users, Calendar } from "lucide-react";
 
 export default function DashboardPage() {
+  // Coming Soon - Dashboard content commented out for now
+  /* 
   // Mock data for the table
   const donors = [
     {
@@ -34,19 +37,15 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <h1 className="text-2xl font-bold text-gray-800">Welcome John,</h1>
 
-      {/* Profile Card */}
       <div className="relative rounded-2xl bg-[#EBF5FF] p-6 shadow-sm">
         <button className="absolute top-6 right-6 text-gray-500 hover:text-gray-700">
           <Edit className="h-5 w-5" />
         </button>
         <div className="flex flex-col gap-6 md:flex-row md:items-center">
           <div className="relative h-24 w-24 overflow-hidden rounded-full border-4 border-white shadow-md">
-            {/* Placeholder profile image */}
             <div className="flex h-full w-full items-center justify-center bg-gray-200 text-gray-400">
                <span className="text-2xl">JM</span>
             </div>
-             {/* Use Image if you have one, e.g. /profile.jpg */}
-             {/* <Image src="/profile.jpg" alt="John Jacobs" fill className="object-cover" /> */}
           </div>
           <div className="flex-1">
             <div className="grid grid-cols-1 gap-y-2 gap-x-8 md:grid-cols-2 lg:grid-cols-3">
@@ -91,9 +90,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {/* Card 1 */}
         <div className="flex items-center gap-4 rounded-2xl bg-[#F3E8FF] p-6 shadow-sm">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#A855F7] text-white">
             <Wallet className="h-6 w-6" />
@@ -104,7 +101,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Card 2 */}
         <div className="flex items-center gap-4 rounded-2xl bg-[#DCFCE7] p-6 shadow-sm">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#22C55E] text-white">
             <Sprout className="h-6 w-6" />
@@ -115,7 +111,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Card 3 */}
         <div className="flex items-center gap-4 rounded-2xl bg-[#FEE2E2] p-6 shadow-sm">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#EF4444] text-white">
             <Users className="h-6 w-6" />
@@ -126,7 +121,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Card 4 */}
         <div className="flex items-center gap-4 rounded-2xl bg-[#FEF3C7] p-6 shadow-sm">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#F59E0B] text-white">
             <Calendar className="h-6 w-6" />
@@ -138,7 +132,6 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* Donors Table */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-gray-900">All Donors</h2>
@@ -173,6 +166,16 @@ export default function DashboardPage() {
             </tbody>
           </table>
         </div>
+      </div>
+    </div>
+  );
+  */
+
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center">
+      <div className="text-center">
+        <h1 className="mb-4 text-4xl font-bold text-gray-800">Coming Soon</h1>
+        <p className="text-lg text-gray-600">We're working on something amazing. Stay tuned!</p>
       </div>
     </div>
   );

@@ -3,13 +3,14 @@
 import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { LayoutDashboard, Wallet, Calendar, ChevronRight, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
 import toast from "react-hot-toast";
 
 export default function Sidebar() {
   const router = useRouter();
+  const pathname = usePathname();
   const { clearAuth } = useAuthStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -56,19 +57,40 @@ export default function Sidebar() {
         {/* Navigation */}
         <ul className="space-y-2 font-medium flex-1">
           <li>
-            <Link href="/dashboard" className="flex items-center rounded-lg bg-white/10 px-4 py-3 text-white transition-colors hover:bg-white/20">
+            <Link 
+              href="/dashboard" 
+              className={`flex items-center rounded-lg px-4 py-3 transition-colors ${
+                pathname === "/dashboard" 
+                  ? "bg-white/10 text-white" 
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
               <LayoutDashboard className="h-5 w-5" />
               <span className="ml-3">Dashboard</span>
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/donations" className="flex items-center rounded-lg px-4 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <Link 
+              href="/dashboard/donations" 
+              className={`flex items-center rounded-lg px-4 py-3 transition-colors ${
+                pathname === "/dashboard/donations" || pathname === "/donation"
+                  ? "bg-white/10 text-white" 
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
               <Wallet className="h-5 w-5" />
               <span className="ml-3">Donations</span>
             </Link>
           </li>
           <li>
-            <Link href="/dashboard/events" className="flex items-center rounded-lg px-4 py-3 text-white/80 hover:bg-white/10 hover:text-white transition-colors">
+            <Link 
+              href="/dashboard/events" 
+              className={`flex items-center rounded-lg px-4 py-3 transition-colors ${
+                pathname === "/dashboard/events" || pathname === "/event"
+                  ? "bg-white/10 text-white" 
+                  : "text-white/80 hover:bg-white/10 hover:text-white"
+              }`}
+            >
               <Calendar className="h-5 w-5" />
               <span className="ml-3">Events</span>
             </Link>

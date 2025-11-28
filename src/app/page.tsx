@@ -11,8 +11,8 @@ export default function Home() {
   useEffect(() => {
     // Check if user is logged in
     if (accessToken) {
-      // User is logged in, redirect to dashboard
-      router.push("/dashboard");
+      // User is logged in, redirect to donation
+      router.push("/donation");
     } else {
       // User is not logged in, redirect to login
       router.push("/login");
