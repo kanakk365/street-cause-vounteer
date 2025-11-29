@@ -21,7 +21,21 @@ const divisions = [
   "Technology",
   "Sales",
 ];
-const roles = ["Volunteer", "Team Lead", "Coordinator", "Manager", "Director"];
+const roles = [
+  "President",
+  "Chief Executive Board",
+  "Chairperson",
+  "Divisional President",
+  "Unit President",
+  "Chairperson Projects",
+  "Vice Chairs",
+  "Division EB",
+  "Unit EB",
+  "Organising Committee",
+  "Coordinator",
+  "Member",
+  "Volunteer",
+];
 
 interface PersonalInfoStepProps {
   onNext?: (data: PersonalInfoData) => void;
