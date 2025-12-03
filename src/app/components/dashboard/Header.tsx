@@ -1,6 +1,49 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Search, Bell, ChevronLeft } from "lucide-react";
+import { useAuthStore } from "@/store/authStore";
+import { apiGet } from "@/lib/apiClient";
+
+interface VolunteerProfile {
+  fullName: string;
+  profileImageUrl: string | null;
+}
 
 export default function Header() {
+  const { accessToken } = useAuthStore();
+  const [volunteer, setVolunteer] = useState<VolunteerProfile | null>(null);
+
+  // Fetch volunteer profile
+  useEffect(() => {
+    const fetchVolunteerProfile = async () => {
+      if (!accessToken) return;
+
+      try {
+        const response = await apiGet("https://scapi.elitceler.com/api/v1/volunteers/dashboard");
+        if (response.ok) {
+          const data = await response.json();
+          setVolunteer(data?.volunteer || null);
+        }
+      } catch (error) {
+        console.error("Error fetching volunteer profile:", error);
+      }
+    };
+
+    fetchVolunteerProfile();
+  }, [accessToken]);
+
+  // Get initials for avatar
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 1);
+  };
+
   return (
     <header 
       className="sticky top-0 z-30 flex h-20 items-center justify-between px-8 shadow-sm text-white"
@@ -30,7 +73,7 @@ export default function Header() {
            
            {/* Profile Circle */}
            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#0054BE] font-bold cursor-pointer hover:bg-gray-100 transition-colors">
-               J
+               {getInitials(volunteer?.fullName)}
            </div>
        </div>
     </header>

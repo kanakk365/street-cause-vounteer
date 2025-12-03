@@ -43,12 +43,16 @@ export default function DonationsPage() {
       }
 
       const data = await response.json();
-      setDonations(data || []);
-      // Calculate total pages (assuming 10 items per page)
-      setTotalPages(Math.ceil((data?.length || 0) / 10));
+      // Extract the donations array from the response
+      const donationsArray = data?.data || [];
+      setDonations(donationsArray);
+      if (data?.meta) {
+        setTotalPages(data.meta.totalPages || 1);
+      } else {
+        setTotalPages(Math.ceil((donationsArray.length || 0) / 10));
+      }
     } catch (error) {
       console.error("Error fetching donations:", error);
-      // Don't show error toast if it's a 401 - user will be redirected
       if (error instanceof Error && !error.message.includes("Unauthorized")) {
         toast.error("Failed to load donations");
       }
@@ -57,7 +61,6 @@ export default function DonationsPage() {
     }
   };
 
-  // Format date to match the display format
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     const day = date.getDate().toString().padStart(2, "0");

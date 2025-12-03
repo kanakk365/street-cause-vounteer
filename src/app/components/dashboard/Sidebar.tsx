@@ -6,14 +6,54 @@ import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
 import { LayoutDashboard, Wallet, Calendar, ChevronRight, LogOut } from "lucide-react";
 import { useAuthStore } from "@/store/authStore";
+import { apiGet } from "@/lib/apiClient";
 import toast from "react-hot-toast";
+
+interface VolunteerProfile {
+  fullName: string;
+  profileImageUrl: string | null;
+}
 
 export default function Sidebar() {
   const router = useRouter();
   const pathname = usePathname();
-  const { clearAuth } = useAuthStore();
+  const { clearAuth, accessToken } = useAuthStore();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [volunteer, setVolunteer] = useState<VolunteerProfile | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Fetch volunteer profile
+  useEffect(() => {
+    const fetchVolunteerProfile = async () => {
+      if (!accessToken) return;
+
+      try {
+        const response = await apiGet("https://scapi.elitceler.com/api/v1/volunteers/dashboard");
+        if (response.ok) {
+          const data = await response.json();
+          setVolunteer(data?.volunteer || null);
+        }
+      } catch (error) {
+        console.error("Error fetching volunteer profile:", error);
+      }
+    };
+
+    fetchVolunteerProfile();
+  }, [accessToken]);
+
+  // Get initials for avatar
+  const getInitials = (name?: string) => {
+    if (!name) return "U";
+    return name
+      .split(" ")
+      .map(n => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 1);
+  };
+
+  // Get first name
+  const firstName = volunteer?.fullName?.split(" ")[0] || "User";
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -104,11 +144,11 @@ export default function Sidebar() {
               className="flex items-center gap-3 rounded-lg px-4 py-3 hover:bg-white/10 transition-colors cursor-pointer"
             >
                 <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#0054BE] font-bold text-lg">
-                    J
+                    {getInitials(volunteer?.fullName)}
                 </div>
                 <div className="flex flex-col flex-1">
                     <span className="text-xs opacity-80">Welcome</span>
-                    <span className="text-sm font-bold">John</span>
+                    <span className="text-sm font-bold">{firstName}</span>
                 </div>
                 <ChevronRight className={`h-4 w-4 opacity-80 transition-transform ${isDropdownOpen ? 'rotate-90' : ''}`} />
             </div>
