@@ -22,7 +22,20 @@ export default function LiveSelfieStep({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+    }
+    setIsCameraActive(false);
+  }, []);
+
   const startCamera = useCallback(async () => {
+    // Stop existing stream if any
+    if (streamRef.current) {
+      stopCamera();
+    }
+
     try {
       setError(null);
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -37,27 +50,27 @@ export default function LiveSelfieStep({
       setError("Unable to access camera. Please check permissions.");
       setIsCameraActive(false);
     }
-  }, []);
-
-  const stopCamera = useCallback(() => {
-    if (streamRef.current) {
-      streamRef.current.getTracks().forEach((track) => track.stop());
-      streamRef.current = null;
-    }
-    setIsCameraActive(false);
-  }, []);
+  }, [stopCamera]);
 
   // Attach stream to video element when it becomes available
   useEffect(() => {
     if (isCameraActive && videoRef.current && streamRef.current) {
       videoRef.current.srcObject = streamRef.current;
+      videoRef.current.play().catch((err) => {
+        console.error("Error playing video:", err);
+      });
     }
   }, [isCameraActive]);
 
-  // Auto-start camera on mount
+  // Auto-start camera on mount (only if no captured image exists)
   useEffect(() => {
     let mounted = true;
     
+    // Don't start camera if we already have a captured image
+    if (capturedImage) {
+      return;
+    }
+
     const initializeCamera = async () => {
       try {
         setError(null);
@@ -92,12 +105,19 @@ export default function LiveSelfieStep({
       }
       setIsCameraActive(false);
     };
-  }, []);
+  }, [capturedImage]);
 
   const capturePhoto = useCallback(() => {
     if (videoRef.current && canvasRef.current) {
       const video = videoRef.current;
       const canvas = canvasRef.current;
+      
+      // Ensure video is ready and has valid dimensions
+      if (video.readyState < 2 || video.videoWidth === 0 || video.videoHeight === 0) {
+        console.warn("Video not ready for capture");
+        return;
+      }
+
       const context = canvas.getContext("2d");
 
       if (context) {
@@ -107,9 +127,9 @@ export default function LiveSelfieStep({
         // Draw the image
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        const imageData = canvas.toDataURL("image/jpeg");
+        const imageData = canvas.toDataURL("image/jpeg", 0.92); // 0.92 quality for better compression
         setCapturedImage(imageData);
-        // Update store
+        // Update store immediately
         setSelfie(imageData);
         stopCamera();
       }
@@ -118,8 +138,9 @@ export default function LiveSelfieStep({
 
   const retakePhoto = useCallback(() => {
     setCapturedImage(null);
+    setSelfie(null); // Clear selfie from store when retaking
     startCamera();
-  }, [startCamera]);
+  }, [startCamera, setSelfie]);
 
   return (
     <div className="w-full mx-auto max-w-4xl  my-auto flex flex-col h-full">
@@ -204,8 +225,9 @@ export default function LiveSelfieStep({
             </button>
             <button
               onClick={() => {
-                // Ensure store is updated
+                // Ensure store is updated and camera is stopped
                 setSelfie(capturedImage);
+                stopCamera();
                 onNext();
               }}
               style={{
@@ -214,7 +236,7 @@ export default function LiveSelfieStep({
               className="flex items-center gap-2 px-6 py-2 rounded-lg text-white font-semibold hover:opacity-90 transition-opacity shadow-md"
             >
               <Upload size={20} />
-              Upload
+              Continue
             </button>
           </div>
         )}
@@ -236,7 +258,14 @@ export default function LiveSelfieStep({
         </button>
 
         <button
-          onClick={onNext}
+          onClick={() => {
+            if (capturedImage) {
+              // Ensure selfie is saved to store before proceeding
+              setSelfie(capturedImage);
+              stopCamera();
+              onNext();
+            }
+          }}
           disabled={!capturedImage}
           className={`flex items-center gap-2 font-semibold transition-colors ${
             capturedImage

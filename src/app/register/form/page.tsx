@@ -27,6 +27,7 @@ export default function RegistrationForm() {
     currentStep,
     setCurrentStep,
     personalInfo,
+    selfie,
     getFormData,
     reset,
   } = useOnboardingStore();
@@ -51,6 +52,11 @@ export default function RegistrationForm() {
   };
 
   const handleLiveSelfieNext = () => {
+    // Validate that selfie exists before proceeding
+    if (!selfie?.image) {
+      toast.error("Please capture a selfie before proceeding");
+      return;
+    }
     setCurrentStep(4);
   };
 
